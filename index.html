@@ -365,21 +365,13 @@ document.getElementById('analyze-btn').addEventListener('click',async()=>{
   document.getElementById('result-wrap').style.display='none';
   document.getElementById('reset-btn').style.display='none';
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6',max_tokens:1000,
-        system:`사진을 분석하는 전문 구도 코치입니다. 아래 JSON 형식으로만 응답하세요. 백틱이나 다른 텍스트 절대 포함 금지:
-{"composition_score":정수1~10,"light_score":정수1~10,"subject_score":정수1~10,"feedback":"잘한점→개선점→핵심팁 순서로 250자 내외","camera":{"aperture":"예:f/2.8","iso":"예:ISO 400","shutter":"예:1/250s","hint":"한줄설명"},"tips":[{"icon":"이모지","name":"구도명","desc":"30자내외"},{"icon":"이모지","name":"구도명","desc":"30자내외"},{"icon":"이모지","name":"구도명","desc":"30자내외"}],"unsplash_query":"이 사진과 비슷한 분위기나 구도의 참고 사진을 찾기 위한 Unsplash 검색 키워드 (영어, 2~4단어)"}`,
-        messages:[{role:'user',content:[
-          {type:'image',source:{type:'base64',media_type:mime,data:b64}},
-          {type:'text',text:'이 사진의 구도를 분석해주세요.'}
-        ]}]
-      })
-    });
-    const data=await res.json();
-    const raw=data.content.map(b=>b.text||'').join('');
+    const res=await fetch('/api/analyze',{
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body:JSON.stringify({image_base64:b64,media_type:mime})
+});
+const data=await res.json();
+const raw=data.result||'';
     let p;try{p=JSON.parse(raw.replace(/```json|```/g,'').trim())}catch{p=null}
     document.getElementById('loading').style.display='none';
     document.getElementById('result-wrap').style.display='block';
